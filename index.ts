@@ -86,6 +86,31 @@ async function main() {
             }
             continue;
           }
+          if ((projectIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.UNAVAILABLE))) {
+            if (devpoolIssue.state === "open") {
+              await octokit.rest.issues.update({
+                owner: DEVPOOL_OWNER_NAME,
+                repo: DEVPOOL_REPO_NAME,
+                issue_number: devpoolIssue.number,
+                state: "closed",
+              });
+              console.log(`Closed (bounty unavailable): ${devpoolIssue.html_url} (${projectIssue.html_url})`);
+            } else {
+              console.log(`Already closed (bounty unavailable): ${devpoolIssue.html_url} (${projectIssue.html_url})`);
+            }
+          } else {
+            if (devpoolIssue.state === "closed") {
+              await octokit.rest.issues.update({
+                owner: DEVPOOL_OWNER_NAME,
+                repo: DEVPOOL_REPO_NAME,
+                issue_number: devpoolIssue.number,
+                state: "open",
+              });
+              console.log(`Opened (bounty available): ${devpoolIssue.html_url} (${projectIssue.html_url})`);
+            } else {
+              console.log(`Already opened (bounty available): ${devpoolIssue.html_url} (${projectIssue.html_url})`);
+            }
+          }
           // prepare for issue updating
           const isDevpoolUnavailableLabel = (devpoolIssue.labels as GitHubLabel[])?.some((label) => label.name === LABELS.UNAVAILABLE);
           const devpoolIssueLabelsStringified = (devpoolIssue.labels as GitHubLabel[])
@@ -126,6 +151,8 @@ async function main() {
           if (projectIssue.state === "closed") continue;
           // if issue doesn't have the "Price" label then skip it, no need to pollute repo with draft issues
           if (!(projectIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.PRICE))) continue;
+          if (!(projectIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.UNAVAILABLE))) continue;
+
           // create a new issue
           const createdIssue = await octokit.rest.issues.create({
             owner: DEVPOOL_OWNER_NAME,
@@ -349,7 +376,7 @@ function getRepoCredentials(projectUrl: string) {
  * Example:
  * ```
  * 50 USD for <1 Hour
- * 
+ *
  * https://github.com/ubiquity/pay.ubq.fi/issues/65
  * ```
  */
@@ -357,7 +384,7 @@ function getSocialMediaText(issue: GitHubIssue): string {
   const labels = issue.labels as GitHubLabel[];
   const priceLabel = labels.find((label) => label.name.includes("Pricing: "))?.name.replace("Pricing: ", "");
   const timeLabel = labels.find((label) => label.name.includes("Time: "))?.name.replace("Time: ", "");
-  // `issue.body` contains URL to the original issue in partner's project 
+  // `issue.body` contains URL to the original issue in partner's project
   // while `issue.html_url` contains URL to the mirrored issue from the devpool directory
   const socialMediaText = `${priceLabel} for ${timeLabel}\n\n${issue.body}`;
   return socialMediaText;
