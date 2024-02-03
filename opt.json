@@ -1,7 +1,7 @@
 {
-  "in": ["BeanieMen"],
+  "in": ["BeanieMen/devpool-directory",
+  "BeanieMen/ubiquibot"],
   "out": [
-    "BeanieMen/devpool-directory",
-    "BeanieMen/ubiquibot"
+    
   ]
 }

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import opt from "./opt.json";
 import _projects from "./projects.json";
 type GitHubIssue = RestEndpointMethodTypes["issues"]["get"]["response"]["data"];
+
 type GitHubLabel = {
   id: number;
   node_id: string;
@@ -18,8 +19,9 @@ const projects = _projects as {
   category?: Record<string, string>;
 };
 
-const DEVPOOL_OWNER_NAME = "ubiquity";
+const DEVPOOL_OWNER_NAME = "BeanieMen";
 const DEVPOOL_REPO_NAME = "devpool-directory";
+
 enum LABELS {
   PRICE = "Price",
   UNAVAILABLE = "Unavailable",
