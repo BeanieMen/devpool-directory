@@ -86,7 +86,8 @@ async function main() {
             }
             continue;
           }
-          if ((projectIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.UNAVAILABLE))) {
+          // If devpool issue has the "Unavailable" label then close such issue
+          if ((devpoolIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.UNAVAILABLE))) {
             if (devpoolIssue.state === "open") {
               await octokit.rest.issues.update({
                 owner: DEVPOOL_OWNER_NAME,
@@ -99,7 +100,7 @@ async function main() {
               console.log(`Already closed (bounty unavailable): ${devpoolIssue.html_url} (${projectIssue.html_url})`);
             }
           } else {
-            if (devpoolIssue.state === "closed") {
+            if (devpoolIssue.state === "closed" && projectIssue.state === "open") {
               await octokit.rest.issues.update({
                 owner: DEVPOOL_OWNER_NAME,
                 repo: DEVPOOL_REPO_NAME,
@@ -151,7 +152,7 @@ async function main() {
           if (projectIssue.state === "closed") continue;
           // if issue doesn't have the "Price" label then skip it, no need to pollute repo with draft issues
           if (!(projectIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.PRICE))) continue;
-          if (!(projectIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.UNAVAILABLE))) continue;
+          if (!projectIssue.assignee) continue;
 
           // create a new issue
           const createdIssue = await octokit.rest.issues.create({
