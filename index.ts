@@ -127,7 +127,7 @@ async function main() {
           // - any label
           if (
             devpoolIssue.title !== projectIssue.title ||
-            devpoolIssue.state !== projectIssue.state ||
+            (devpoolIssue.state !== projectIssue.state && !projectIssue.assignee) ||
             (!isDevpoolUnavailableLabel && projectIssue.assignee?.login) ||
             (isDevpoolUnavailableLabel && !projectIssue.assignee?.login) ||
             devpoolIssue.body !== projectIssue.html_url ||
