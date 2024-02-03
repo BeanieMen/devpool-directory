@@ -152,7 +152,7 @@ async function main() {
           if (projectIssue.state === "closed") continue;
           // if issue doesn't have the "Price" label then skip it, no need to pollute repo with draft issues
           if (!(projectIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.PRICE))) continue;
-          if (!projectIssue.assignee) continue;
+          if (projectIssue.assignee) continue;
 
           // create a new issue
           const createdIssue = await octokit.rest.issues.create({
