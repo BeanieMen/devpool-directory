@@ -1,12 +1,12 @@
 {
   "in": ["BeanieMen"],
   "out": [
-    "ubiquity/devpool-directory",
-    "ubiquity/card-issuance",
-    "ubiquity/research",
-    "ubiquity/business-development",
-    "ubiquity/ubiquibar",
-    "ubiquity/ubiquibot",
-    "ubiquity/ubiquibot-telegram"
+    "BeanieMen/devpool-directory",
+    "BeanieMen/card-issuance",
+    "BeanieMen/research",
+    "BeanieMen/business-development",
+    "BeanieMen/ubiquibar",
+    "BeanieMen/ubiquibot",
+    "BeanieMen/ubiquibot-telegram"
   ]
 }
