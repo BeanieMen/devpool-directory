@@ -25,7 +25,7 @@ enum LABELS {
   UNAVAILABLE = "Unavailable",
 }
 
-import twitter from "./helpers/twitter";
+// import twitter from "./helpers/twitter";
 
 // init octokit
 dotenv.config();
@@ -165,8 +165,8 @@ async function main() {
           console.log(`Created: ${createdIssue.data.html_url} (${projectIssue.html_url})`);
 
           // post to social media
-          const socialMediaText = getSocialMediaText(createdIssue.data);
-          await twitter.postTweet(socialMediaText);
+          // const socialMediaText = getSocialMediaText(createdIssue.data);
+          // await twitter.postTweet(socialMediaText);
         }
       }
     }
@@ -370,23 +370,23 @@ function getRepoCredentials(projectUrl: string) {
   return [ownerName, repoName];
 }
 
-/**
- * Returns text for social media (twitter, telegram, etc...)
- * @param issue Github issue data
- * @returns Social media text
- * Example:
- * ```
- * 50 USD for <1 Hour
- *
- * https://github.com/ubiquity/pay.ubq.fi/issues/65
- * ```
- */
-function getSocialMediaText(issue: GitHubIssue): string {
-  const labels = issue.labels as GitHubLabel[];
-  const priceLabel = labels.find((label) => label.name.includes("Pricing: "))?.name.replace("Pricing: ", "");
-  const timeLabel = labels.find((label) => label.name.includes("Time: "))?.name.replace("Time: ", "");
-  // `issue.body` contains URL to the original issue in partner's project
-  // while `issue.html_url` contains URL to the mirrored issue from the devpool directory
-  const socialMediaText = `${priceLabel} for ${timeLabel}\n\n${issue.body}`;
-  return socialMediaText;
-}
+// /**
+//  * Returns text for social media (twitter, telegram, etc...)
+//  * @param issue Github issue data
+//  * @returns Social media text
+//  * Example:
+//  * ```
+//  * 50 USD for <1 Hour
+//  *
+//  * https://github.com/ubiquity/pay.ubq.fi/issues/65
+//  * ```
+//  */
+// function getSocialMediaText(issue: GitHubIssue): string {
+//   const labels = issue.labels as GitHubLabel[];
+//   const priceLabel = labels.find((label) => label.name.includes("Pricing: "))?.name.replace("Pricing: ", "");
+//   const timeLabel = labels.find((label) => label.name.includes("Time: "))?.name.replace("Time: ", "");
+//   // `issue.body` contains URL to the original issue in partner's project
+//   // while `issue.html_url` contains URL to the mirrored issue from the devpool directory
+//   const socialMediaText = `${priceLabel} for ${timeLabel}\n\n${issue.body}`;
+//   return socialMediaText;
+// }
