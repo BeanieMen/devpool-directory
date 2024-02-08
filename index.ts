@@ -32,7 +32,7 @@ enum LABELS {
 // init octokit
 dotenv.config();
 
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const octokit = new Octokit({ auth: process.env.DEVPOOL_GITHUB_API_TOKEN });
 
 /**
  * Main function
