@@ -32,7 +32,7 @@ enum LABELS {
 // init octokit
 dotenv.config();
 
-const octokit = new Octokit({ auth: process.env.DEVPOOL_GITHUB_API_TOKEN });
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 /**
  * Main function
@@ -88,6 +88,29 @@ async function main() {
             }
             continue;
           }
+          if (projectIssue.assignee?.login) {
+            if (devpoolIssue.state === "open") {
+              await octokit.rest.issues.update({
+                owner: DEVPOOL_OWNER_NAME,
+                repo: DEVPOOL_REPO_NAME,
+                issue_number: devpoolIssue.number,
+                state: "closed",
+              });
+              console.log(`Closed (bounty unavailable): ${devpoolIssue.html_url} (${projectIssue.html_url})`);
+              continue;
+            }
+          } else {
+            if (devpoolIssue.state === "closed" && projectIssue.state === "open") {
+              await octokit.rest.issues.update({
+                owner: DEVPOOL_OWNER_NAME,
+                repo: DEVPOOL_REPO_NAME,
+                issue_number: devpoolIssue.number,
+                state: "open",
+              });
+              console.log(`Opened (bounty available): ${devpoolIssue.html_url} (${projectIssue.html_url})`);
+              continue;
+            }
+          }
 
           // prepare for issue updating
           const isDevpoolUnavailableLabel = (devpoolIssue.labels as GitHubLabel[])?.some((label) => label.name === LABELS.UNAVAILABLE);
@@ -105,7 +128,6 @@ async function main() {
           if (
             devpoolIssue.title !== projectIssue.title ||
             projectIssue.state == "close" ||
-            (projectIssue.state == "open" && projectIssue.assignee?.login) ||
             (!isDevpoolUnavailableLabel && projectIssue.assignee?.login) ||
             (isDevpoolUnavailableLabel && !projectIssue.assignee?.login) ||
             devpoolIssue.body !== projectIssue.html_url ||
