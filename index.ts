@@ -70,6 +70,11 @@ async function main() {
         // if issue exists in devpool
         const devpoolIssue = getIssueByLabel(devpoolIssues, `id: ${projectIssue.node_id}`);
         if (devpoolIssue) {
+          if (projectIssue.state == "closed") {
+            const socialMediaText = getSocialMediaText(devpoolIssue);
+            await twitter.deleteTweetByQuery(socialMediaText);
+          }
+
           // If project issue doesn't have the "Price" label (i.e. it has been removed) then close
           // the devpool issue if it is not already closed, no need to pollute devpool repo with draft issues
           if (!(projectIssue.labels as GitHubLabel[]).some((label) => label.name.includes(LABELS.PRICE))) {
@@ -349,7 +354,7 @@ function getRepoCredentials(projectUrl: string) {
  * Example:
  * ```
  * 50 USD for <1 Hour
- * 
+ *
  * https://github.com/ubiquity/pay.ubq.fi/issues/65
  * ```
  */
@@ -357,7 +362,7 @@ function getSocialMediaText(issue: GitHubIssue): string {
   const labels = issue.labels as GitHubLabel[];
   const priceLabel = labels.find((label) => label.name.includes("Pricing: "))?.name.replace("Pricing: ", "");
   const timeLabel = labels.find((label) => label.name.includes("Time: "))?.name.replace("Time: ", "");
-  // `issue.body` contains URL to the original issue in partner's project 
+  // `issue.body` contains URL to the original issue in partner's project
   // while `issue.html_url` contains URL to the mirrored issue from the devpool directory
   const socialMediaText = `${priceLabel} for ${timeLabel}\n\n${issue.body}`;
   return socialMediaText;
