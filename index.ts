@@ -127,7 +127,8 @@ async function main() {
           // - any label
           if (
             devpoolIssue.title !== projectIssue.title ||
-            projectIssue.state == "close" ||
+            (projectIssue.state == "closed" && devpoolIssue.state == "open") ||
+            (projectIssue.state == "open" && devpoolIssue.state == "closed" && !projectIssue.assignee?.login) ||
             (!isDevpoolUnavailableLabel && projectIssue.assignee?.login) ||
             (isDevpoolUnavailableLabel && !projectIssue.assignee?.login) ||
             devpoolIssue.body !== projectIssue.html_url ||
