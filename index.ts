@@ -3,6 +3,8 @@ import { Octokit } from "@octokit/rest";
 import dotenv from "dotenv";
 import opt from "./opt.json";
 import _projects from "./projects.json";
+import * as fs from "fs/promises";
+
 type GitHubIssue = RestEndpointMethodTypes["issues"]["get"]["response"]["data"];
 type GitHubLabel = {
   id: number;
@@ -38,6 +40,13 @@ const octokit = new Octokit({ auth: process.env.DEVPOOL_GITHUB_API_TOKEN });
  * TODO: handle project deletion
  */
 async function main() {
+  let twitterMap: { [key: string]: string } = {};
+  try {
+    twitterMap = JSON.parse(await fs.readFile("./twitterMap.json", "utf8"));
+  } catch (error) {
+    await fs.writeFile("./twitterMap.json", JSON.stringify({}));
+  }
+
   try {
     // get devpool issues
     const devpoolIssues: GitHubIssue[] = await getAllIssues(DEVPOOL_OWNER_NAME, DEVPOOL_REPO_NAME);
@@ -71,8 +80,9 @@ async function main() {
         const devpoolIssue = getIssueByLabel(devpoolIssues, `id: ${projectIssue.node_id}`);
         if (devpoolIssue) {
           if (projectIssue.state == "closed") {
-            const socialMediaText = getSocialMediaText(devpoolIssue);
-            await twitter.deleteTweetByQuery(socialMediaText);
+            await twitter.deleteTweet(twitterMap[projectIssue.node_id]);
+            delete twitterMap[projectIssue.node_id];
+            await fs.writeFile("./twitterMap.json", JSON.stringify(twitterMap));
           }
 
           // If project issue doesn't have the "Price" label (i.e. it has been removed) then close
@@ -143,7 +153,9 @@ async function main() {
 
           // post to social media
           const socialMediaText = getSocialMediaText(createdIssue.data);
-          await twitter.postTweet(socialMediaText);
+          const tweetId = await twitter.postTweet(socialMediaText);
+          twitterMap[createdIssue.data.node_id] = tweetId ?? "";
+          await fs.writeFile("./twitterMap.json", JSON.stringify(twitterMap));
         }
       }
     }

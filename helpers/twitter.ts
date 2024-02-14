@@ -1,4 +1,4 @@
-import { TweetV2, TwitterApi } from "twitter-api-v2";
+import { TwitterApi } from "twitter-api-v2";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -23,24 +23,9 @@ async function postTweet(status: string) {
   try {
     const { data } = await twitterClient.v2.tweet(status);
     console.log(`Tweet posted successfully, id: ${data.id}, text: ${data.text}`);
+    return data.id;
   } catch (error) {
     console.error("Error posting tweet", error);
-  }
-}
-async function getAllTweets(userId: string) {
-  const tweets: TweetV2[] = [];
-
-  try {
-    let { data } = await twitterClient.v2.userTimeline(userId, { max_results: 100 });
-    tweets.push(...data.data);
-    while (data.meta.next_token) {
-      data = (await twitterClient.v2.userTimeline(userId, { pagination_token: data.meta.next_token })).data;
-      tweets.push(...data.data);
-    }
-    console.log(`successfully fetched all tweets for, id: ${userId}`);
-    return tweets;
-  } catch (error) {
-    console.error("Error fetching all tweets", error);
   }
 }
 
@@ -57,23 +42,8 @@ async function deleteTweet(id: string) {
   }
 }
 
-async function deleteTweetByQuery(body: string) {
-  const userId = (await twitterClient.currentUserV2()).data.id;
-  try {
-    const tweets = await getAllTweets(userId);
-    const tweet = tweets?.filter((v) => v.text == body);
-    if (tweet) {
-      await deleteTweet(tweet[0].id);
-    }
-  } catch (error) {
-    console.error("Error deleting tweet", error);
-  }
-}
-
 export default {
   postTweet,
   deleteTweet,
-  getAllTweets,
-  deleteTweetByQuery,
   client: twitterClient,
 };
