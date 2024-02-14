@@ -32,11 +32,6 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: twitterMap
-
       - name: Sync Issues
         env:
           ARTIFACT_CONTENTS: ${{ steps.download-artifact.outputs.artifact_content }}
