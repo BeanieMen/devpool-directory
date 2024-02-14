@@ -22,6 +22,9 @@ jobs:
         with:
           node-version: "20.10.0"
 
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+
       - name: Yarn Install
         run: yarn install --mode=skip-build
 
@@ -31,24 +34,6 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
-
-
-      # - name: Check if Artifact Exists
-      #   id: check_artifact
-      #   run: |
-      #     if [ -d "$GITHUB_WORKSPACE/twitterMap" ]; then
-      #       echo "Artifact exists."
-      #       echo ::set-output name=artifact_exists::true
-      #     else
-      #       echo "Artifact does not exist."
-      #       echo ::set-output name=artifact_exists::false
-      #     fi
-
-      - name: Download Artifact
-        # if: steps.check_artifact.outputs.artifact_exists == 'true'
-        uses: actions/download-artifact@v4
-        with:
-          name: twitterMap
 
       - name: Sync Issues
         env:
