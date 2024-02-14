@@ -1,12 +1,13 @@
 name: Sync Issues
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - development
   schedule:
     - cron: "15 * * * *" # every hour at minute 15 (github recommends to set such cron jobs not at the start of an hour)
+  workflow_dispatch:
+
 
 jobs:
   sync-issues:
