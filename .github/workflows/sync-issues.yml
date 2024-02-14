@@ -13,7 +13,7 @@ jobs:
     name: Sync Issues
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+            - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup Node
@@ -31,11 +31,17 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: twitterMap
+
       - name: Sync Issues
         env:
-          DEVPOOL_GITHUB_API_TOKEN: ${{ steps.get_installation_token.outputs.token }}
+          ARTIFACT_CONTENTS: ${{ steps.download-artifact.outputs.artifact_content }}
+          DEVPOOL_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Or your GitHub API token
           TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
           TWITTER_API_KEY_SECRET: ${{ secrets.TWITTER_API_KEY_SECRET }}
           TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
           TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-        run: npx tsx index.ts
+        run: echo $ARTIFACT_CONTENTS
